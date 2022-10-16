@@ -1,15 +1,11 @@
 package org.vislower.fileserver;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
 
-    private DataInputStream input;
-    private DataOutputStream output;
     private ServerSocket serverSocket;
     private Socket socket;
 

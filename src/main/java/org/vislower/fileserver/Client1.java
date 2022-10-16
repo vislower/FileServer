@@ -2,26 +2,22 @@ package org.vislower.fileserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
 public class Client1 {
 
-    private DataOutputStream output;
-    private DataInputStream input;
+    private final DataOutputStream output;
+    private final DataInputStream input;
     private final Socket socket;
 
     public Client1(String address, int port){
         try {
             socket = new Socket(address, port);
             System.out.println("You are connected to the file server");
-
             output = new DataOutputStream(socket.getOutputStream());
             input = new DataInputStream(socket.getInputStream());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -40,7 +36,6 @@ public class Client1 {
                     BufferedReader br = new BufferedReader(isr);
                     String locationPath;
                     ArrayList<File> files = new ArrayList<>();
-                    boolean empty = false;
                     while (true) {
                         System.out.println("Enter the path of the file you want to send, press [ENTER] when you have finished :  ");
                         locationPath = br.readLine();
@@ -86,7 +81,6 @@ public class Client1 {
                     BufferedReader br = new BufferedReader(isr);
                     String locationPath;
                     ArrayList<File> files = new ArrayList<>();
-                    boolean empty = false;
                     while (true) {
                         System.out.println("Enter the path of the directory you want to send, press [ENTER] when you have finished :  ");
                         locationPath = br.readLine();
@@ -278,7 +272,7 @@ public class Client1 {
 
     private void sendFile(File file, String locationPath, String destinationPath) {
         try {
-            int bytesCount = 0;
+            int bytesCount;
             FileInputStream fileInputStream = new FileInputStream(file);
 
             // retrieve name of the file
@@ -309,8 +303,6 @@ public class Client1 {
                 output.flush();
             }
             fileInputStream.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -325,13 +317,15 @@ public class Client1 {
 
             output.writeUTF(newDestinationPath); // so the server can create the directory
             files = directory.listFiles();
-            for (File f : files) {
-                if (f.isFile()) {
-                    output.writeShort(0);
-                    sendFile(f, f.getAbsolutePath(), newDestinationPath);
-                } else if (f.isDirectory()) {
-                    output.writeShort(1);
-                    sendDirectory(f, newDestinationPath);
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isFile()) {
+                        output.writeShort(0);
+                        sendFile(f, f.getAbsolutePath(), newDestinationPath);
+                    } else if (f.isDirectory()) {
+                        output.writeShort(1);
+                        sendDirectory(f, newDestinationPath);
+                    }
                 }
             }
             output.writeShort(2);
@@ -343,7 +337,7 @@ public class Client1 {
     private void receiveFile() {
 
         try {
-            int bytesCount = 0;
+            int bytesCount;
             String parentDirectoryName = input.readUTF();
             File parentDirectory = new File(parentDirectoryName);
             if (!parentDirectory.exists()){
@@ -359,8 +353,6 @@ public class Client1 {
             }
             fileOutputStream.close();
 
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

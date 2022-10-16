@@ -143,7 +143,7 @@ public class MultithreadedServer implements Runnable{
     private void receiveFile() {
 
         try {
-            int bytesCount = 0;
+            int bytesCount;
             String parentDirectoryName = input.readUTF();
             File parentDirectory = new File(parentDirectoryName);
             if (!parentDirectory.exists()){
@@ -158,8 +158,6 @@ public class MultithreadedServer implements Runnable{
                 size -= bytesCount;
             }
             fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -196,7 +194,7 @@ public class MultithreadedServer implements Runnable{
 
     private void sendFile(File file, String locationPath, String destinationPath) {
         try {
-            int bytesCount = 0;
+            int bytesCount;
             FileInputStream fileInputStream = new FileInputStream(file);
 
             // retrieve name of the file
@@ -227,8 +225,6 @@ public class MultithreadedServer implements Runnable{
                 output.flush();
             }
             fileInputStream.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -243,13 +239,15 @@ public class MultithreadedServer implements Runnable{
 
             output.writeUTF(newDestinationPath);
             files = directory.listFiles();
-            for (File f : files) {
-                if (f.isFile()) {
-                    output.writeShort(0);
-                    sendFile(f, f.getAbsolutePath(), newDestinationPath);
-                } else if (f.isDirectory()) {
-                    output.writeShort(1);
-                    sendDirectory(f, newDestinationPath);
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isFile()) {
+                        output.writeShort(0);
+                        sendFile(f, f.getAbsolutePath(), newDestinationPath);
+                    } else if (f.isDirectory()) {
+                        output.writeShort(1);
+                        sendDirectory(f, newDestinationPath);
+                    }
                 }
             }
             output.writeShort(2);
@@ -260,12 +258,14 @@ public class MultithreadedServer implements Runnable{
 
     private void deleteDirectory(File directory) {
         File[] files = directory.listFiles();
-        for (File f : files){
-            if (f.isFile()){
-                f.delete();
-            } else if (f.isDirectory()) {
-                deleteDirectory(f);
-                f.delete();
+        if (files != null) {
+            for (File f : files){
+                if (f.isFile()){
+                    f.delete();
+                } else if (f.isDirectory()) {
+                    deleteDirectory(f);
+                    f.delete();
+                }
             }
         }
         directory.delete();
