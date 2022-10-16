@@ -11,16 +11,21 @@ public class Server {
 
     private int clientNumber = 0;
 
-    public Server(int port){
-        // starts server and waits for a connection
+    private int port;
+
+    public Server(int serverPort) {
+        port = serverPort;
+    }
+
+    private void startServer() {
         System.out.println("Server started");
         while(true) {
             try {
-                serverSocket = new ServerSocket(port);
+                serverSocket = createServerSocket();
                 System.out.println("Waiting for client ...");
 
                 // server listening
-                socket = serverSocket.accept();
+                socket = createClientSocket(serverSocket);
                 clientNumber ++;
                 System.out.println("Client " + clientNumber + " accepted");
 
@@ -37,7 +42,16 @@ public class Server {
         }
     }
 
+    public ServerSocket createServerSocket() throws IOException {
+        return new ServerSocket(port);
+    }
+
+    public Socket createClientSocket(ServerSocket serverSocket) throws IOException {
+        return serverSocket.accept();
+    }
+
     public static void main(String[] args) {
         Server server = new Server(5000);
+        server.startServer();
     }
 }
