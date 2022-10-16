@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Client1 {
+public class Client {
 
     private final DataOutputStream output;
     private final DataInputStream input;
     private final Socket socket;
 
-    public Client1(String address, int port){
+    public Client(String address, int port){
         try {
             socket = new Socket(address, port);
             System.out.println("You are connected to the file server");
@@ -391,8 +391,8 @@ public class Client1 {
 
 
     public static void main(String[] args) {
-        Client1 client1 = new Client1("127.0.0.1", 5000);
-        client1.execute();
+        Client client = new Client("127.0.0.1", 5000);
+        client.execute();
 
     }
 }
