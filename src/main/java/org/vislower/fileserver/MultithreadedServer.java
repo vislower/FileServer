@@ -21,8 +21,8 @@ public class MultithreadedServer implements Runnable{
     public void run() {
         // takes input from the client socket
         try {
-            input = new DataInputStream(socket.getInputStream());
-            output = new DataOutputStream(socket.getOutputStream());
+            input = SocketIO.createInputStream(socket);
+            output = SocketIO.createOutputStream(socket);
 
             short request;
             while (true){
