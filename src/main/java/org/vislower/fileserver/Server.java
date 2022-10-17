@@ -19,9 +19,13 @@ public class Server {
 
     private void startServer() {
         System.out.println("Server started");
+        try {
+            serverSocket = createServerSocket();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         while(true) {
             try {
-                serverSocket = createServerSocket();
                 System.out.println("Waiting for client ...");
 
                 // server listening
@@ -34,8 +38,6 @@ public class Server {
                 Thread thread = new Thread(ms);
                 thread.start();
 
-                // close socket server
-                serverSocket.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
