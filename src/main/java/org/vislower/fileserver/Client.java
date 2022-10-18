@@ -14,10 +14,11 @@ public class Client {
 
     public Client(String address, int port){
         try {
-            socket = new Socket(address, port);
+            socket = createClientSocket(address, port);
             System.out.println("You are connected to the file server");
-            output = new DataOutputStream(socket.getOutputStream());
-            input = new DataInputStream(socket.getInputStream());
+            output = SocketIO.createOutputStream(socket);
+            input = SocketIO.createInputStream(socket);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -268,6 +269,10 @@ public class Client {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Socket createClientSocket(String address, int port) throws IOException {
+        return new Socket(address, port);
     }
 
     private void sendFile(File file, String locationPath, String destinationPath) {
