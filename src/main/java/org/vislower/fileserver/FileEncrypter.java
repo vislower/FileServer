@@ -14,11 +14,13 @@ public class FileEncrypter {
     private final Cipher cipher;
     private final String algorithm = "AES/CBC/PKCS5PADDING";
     private final File fileToEncrypt;
+    private final byte[] iv;
 
     public FileEncrypter(File file, SecretKey secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         this.fileToEncrypt = file;
         this.secretKey = secretKey;
         this.cipher = Cipher.getInstance(algorithm);
+        this.iv = getIVSecureRandom();
     }
 
     private byte[] getIVSecureRandom() {
@@ -32,29 +34,21 @@ public class FileEncrypter {
         }
     }
 
-    // TODO : break this method in smaller method
-    private void encryptFile(){
+    private byte[] getEncryptedBytesFromFile(){
         try {
-            FileInputStream fileInputStream = new FileInputStream(fileToEncrypt);
-            byte[] bFile = new byte[(int) fileToEncrypt.length()];
-            fileInputStream.read(bFile);
-            fileInputStream.close();
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(fileToEncrypt));
+            byte[] byteFile = new byte[(int) fileToEncrypt.length()];
+            bufferedInputStream.read(byteFile);
 
-            byte[] iv = getIVSecureRandom();
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
+            byte[] encryptedBytes = cipher.doFinal(byteFile);
 
-            String fileToEncryptName = fileToEncrypt.getAbsolutePath();
-            StringBuilder stringBuilder = new StringBuilder();
-            for(int i = 0; fileToEncryptName.charAt(i) != '.'; i++){
-                stringBuilder.append(fileToEncryptName.charAt(i));
-            }
-            stringBuilder.append(".enc");
-            String encryptedFileName = stringBuilder.toString();
+            byte[] encryptedByteFile = new byte[(int) (encryptedBytes.length + iv.length)];
+            System.arraycopy(iv, 0, encryptedByteFile, 0, iv.length);
+            System.arraycopy(encryptedBytes,0 ,encryptedByteFile ,iv.length ,encryptedBytes.length);
 
-            FileOutputStream fileOutputStream = new FileOutputStream(encryptedFileName);
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(fileOutputStream, cipher);
-            fileOutputStream.write(iv);
-            cipherOutputStream.write(bFile);
+            return encryptedByteFile;
+
         } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         } catch (InvalidAlgorithmParameterException e) {
@@ -62,6 +56,10 @@ public class FileEncrypter {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        } catch (BadPaddingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -83,10 +81,13 @@ public class FileEncrypter {
 
         return key;
     }
+
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
-        File file = new File("/home/admin/client/fox.png");
+        File file = new File("/home/admin/client/BashDoc.pdf");
         FileEncrypter fileEncrypter = new FileEncrypter(file, createAESKey());
-        fileEncrypter.encryptFile();
+        byte[] b = fileEncrypter.getEncryptedBytesFromFile();
+        FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/admin/BashDoc.enc"));
+        fileOutputStream.write(b);
     }
 
 }
