@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileEncrypterDecrypterIntegrationTest {
 
-    // This test uses as a test the java-developers-guide.pdf in the resources folder of the test folder.
+    // This test uses the java-developers-guide.pdf in the resources folder of the test folder as a test file.
 
     @Test
     void whenEncryptingFileAndThenDecrypting_thenOriginalFileIsReturned() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {

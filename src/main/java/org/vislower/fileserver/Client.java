@@ -275,7 +275,7 @@ public class Client {
         return new Socket(address, port);
     }
 
-    private void sendFile(File file, String locationPath, String destinationPath) {
+    private void sendFile(File file, String locationPath, String destinationPath) {// use ByteArrayInputStream to convert encrypted bytes to InputStream
         try {
             int bytesCount;
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -352,7 +352,7 @@ public class Client {
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             long size = input.readLong(); // read file size
             byte[] buffer = new byte[4096];
-            while (size > 0 && (bytesCount = input.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1){
+            while (size > 0 && (bytesCount = input.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1){ // write array to ByteArrayOutputStream and then convert to byte or read directly to array
                 fileOutputStream.write(buffer, 0, bytesCount);
                 size -= bytesCount;
             }
