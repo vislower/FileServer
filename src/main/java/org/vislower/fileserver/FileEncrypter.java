@@ -82,12 +82,16 @@ public class FileEncrypter {
         return key;
     }
 
+    // TODO : replace this method by a JUnit test
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
-        File file = new File("/home/admin/client/BashDoc.pdf");
-        FileEncrypter fileEncrypter = new FileEncrypter(file, createAESKey());
+        File file = new File("/home/admin/client/fox.png");
+        SecretKey sk = createAESKey();
+        FileEncrypter fileEncrypter = new FileEncrypter(file, sk);
         byte[] b = fileEncrypter.getEncryptedBytesFromFile();
-        FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/admin/BashDoc.enc"));
-        fileOutputStream.write(b);
+        FileDecrypter fileDecrypter = new FileDecrypter(b, sk);
+        byte[] decrypted = fileDecrypter.getDecryptedBytes();
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(new File("/home/admin/server/fox.png")));
+        bufferedOutputStream.write(decrypted);
     }
 
 }
