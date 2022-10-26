@@ -64,22 +64,4 @@ public class FileEncrypter {
         }
     }
 
-    // TODO : delete this method
-    public static SecretKey createAESKey() {
-        SecureRandom securerandom = new SecureRandom();
-
-        KeyGenerator keygenerator;
-        try {
-            keygenerator = KeyGenerator.getInstance("AES"); // return KeyGenerator object that generates secret keys for the specified algorithm
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-
-        keygenerator.init(256, securerandom); // Initializes this key generator for a certain keysize, using a user-provided source of randomness.
-
-        SecretKey key = keygenerator.generateKey();
-
-        return key;
-    }
-
 }

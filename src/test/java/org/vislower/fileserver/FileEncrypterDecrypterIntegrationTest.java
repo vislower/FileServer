@@ -21,7 +21,7 @@ class FileEncrypterDecrypterIntegrationTest {
     @Test
     void whenEncryptingFileAndThenDecrypting_thenOriginalFileIsReturned() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         File fileToEncrypt = new File("src/test/resources/java-developers-guide.pdf");
-        SecretKey secretKey = FileEncrypter.createAESKey();
+        SecretKey secretKey = SymmetricKeyGenerator.createAESKey();
 
         FileEncrypter fileEncrypter = new FileEncrypter(fileToEncrypt, secretKey);
         byte[] encryptedFileAsBytes = fileEncrypter.getEncryptedBytesFromFile();
