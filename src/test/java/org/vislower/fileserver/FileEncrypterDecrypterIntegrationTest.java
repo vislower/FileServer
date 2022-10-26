@@ -1,6 +1,8 @@
 package org.vislower.fileserver;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -13,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileEncrypterDecrypterIntegrationTest {
 
     // This test uses the java-developers-guide.pdf in the resources folder of the test folder as a test file.
@@ -34,6 +36,13 @@ class FileEncrypterDecrypterIntegrationTest {
         bufferedOutputStream.write(decryptedFileAsBytes);
 
         assertEquals(Files.mismatch(fileToEncrypt.toPath(), decryptedFile.toPath()), -1);
+        bufferedOutputStream.close();
+    }
+
+    @AfterAll
+    void cleanUp() {
+        File decryptedFile = new File("src/test/resources/java-developers-guide-2.pdf");
+        decryptedFile.delete();
     }
 
 }
