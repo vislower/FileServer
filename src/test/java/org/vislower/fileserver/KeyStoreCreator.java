@@ -16,6 +16,18 @@ public class KeyStoreCreator {
         this.keyStorePassword = keyStorePassword.toCharArray();
     }
 
+    public KeyStore createKeyStoreWithSymmetricKey() throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+        SecretKey symmetricKey = SymmetricKeyGenerator.createAESKey();
+        initKeyStore();
+        saveKeyStore();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(new FileInputStream("ClientKeystore.jks"), keyStorePassword);
+        KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(symmetricKey);
+        KeyStore.ProtectionParameter entryPassword = new KeyStore.PasswordProtection(keyStorePassword);
+        keyStore.setEntry("FileEncryptionAESKey", secretKeyEntry, entryPassword);
+        return keyStore;
+    }
+
     public void initKeyStore() throws CertificateException, IOException, NoSuchAlgorithmException {
         keyStore.load(null, keyStorePassword);
     }
@@ -23,6 +35,7 @@ public class KeyStoreCreator {
     public void saveKeyStore() throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
         FileOutputStream fileOutputStream = new FileOutputStream("ClientKeystore.jks");
         keyStore.store(fileOutputStream, keyStorePassword);
+        fileOutputStream.close();
     }
     public void saveSymmetricKey(String alias, SecretKey symmetricKey) throws KeyStoreException {
         KeyStore.SecretKeyEntry secretKey = new KeyStore.SecretKeyEntry(symmetricKey);
@@ -42,8 +55,7 @@ public class KeyStoreCreator {
         try {
             KeyStoreCreator keyStoreCreator = new KeyStoreCreator(password);
             keyStoreCreator.initKeyStore();
-            keyStoreCreator.saveKeyStore();
-            System.out.println(Base64.getEncoder().encodeToString(secretKey.getEncoded()));
+            //keyStoreCreator.saveKeyStore();
 
             KeyStore ks = KeyStore.getInstance("JKS");
             ks.load(new FileInputStream("ClientKeystore.jks"), "1234".toCharArray());
