@@ -10,11 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class KeyStoreCreatorTest {
 
     private final String password = "test";
+    SecretKey symmetricKey = SymmetricKeyGenerator.createAESKey();
     private KeyStore keyStoreTest = null;
 
     @BeforeAll
     void setup() throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         KeyStoreCreator keyStoreCreator = new KeyStoreCreator(password);
-        keyStoreTest = keyStoreCreator.createKeyStoreWithSymmetricKey();
+        keyStoreTest = keyStoreCreator.createKeyStoreWithSymmetricKey(symmetricKey);
     }
 
     @Test
@@ -50,6 +49,16 @@ class KeyStoreCreatorTest {
     void whenAddingAlias_thenCanQueryByType() throws KeyStoreException {
         assertTrue(keyStoreTest.containsAlias("FileEncryptionAESKey"));
         assertFalse(keyStoreTest.containsAlias("other-alias"));
+    }
+
+    @Test
+    void testIfKeyIsNotTempered() throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
+        Key retrievedKey = keyStoreTest.getKey("FileEncryptionAESKey", password.toCharArray());
+        byte[] rawSymmetricKey = symmetricKey.getEncoded();
+        String rawSymmetricKeyAsString = Base64.getEncoder().encodeToString(rawSymmetricKey);
+        byte[] rawRetrievedKey = retrievedKey.getEncoded();
+        String rawRetrievedKeyAsString = Base64.getEncoder().encodeToString(rawRetrievedKey);
+        assertEquals(rawRetrievedKeyAsString, rawSymmetricKeyAsString);
     }
 
     @AfterAll

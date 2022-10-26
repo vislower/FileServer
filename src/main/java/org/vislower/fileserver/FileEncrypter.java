@@ -3,20 +3,17 @@ package org.vislower.fileserver;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
 
 public class FileEncrypter {
 
-    private final SecretKey secretKey;
+    private final Key secretKey;
     private final Cipher cipher;
     private final String algorithm = "AES/CBC/PKCS5PADDING";
     private final File fileToEncrypt;
     private final byte[] iv;
 
-    public FileEncrypter(File file, SecretKey secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
+    public FileEncrypter(File file, Key secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         this.fileToEncrypt = file;
         this.secretKey = secretKey;
         this.cipher = Cipher.getInstance(algorithm);

@@ -5,18 +5,19 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 
 public class FileDecrypter {
 
-    private final SecretKey secretKey;
+    private final Key secretKey;
     private final Cipher cipher;
     private final String algorithm = "AES/CBC/PKCS5PADDING";
     private final byte[] encryptedBytesFile;
     private final byte[] iv = new byte[16];
 
 
-    public FileDecrypter(byte[] encryptedBytesFile, SecretKey secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public FileDecrypter(byte[] encryptedBytesFile, Key secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.encryptedBytesFile = encryptedBytesFile;
         this.secretKey = secretKey;
         this.cipher = Cipher.getInstance(algorithm);
