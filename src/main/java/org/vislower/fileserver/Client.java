@@ -31,15 +31,8 @@ public class Client {
             KeyStore ks = KeyStore.getInstance("JKS");
             ks.load(new FileInputStream("ClientKeyStore.jks"), password.toCharArray());
             this.symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (CertificateException e) {
-            throw new RuntimeException(e);
-        } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (UnrecoverableKeyException e) {
+        } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException |
+                 CertificateException e) {
             throw new RuntimeException(e);
         }
     }
@@ -351,11 +344,7 @@ public class Client {
                 output.flush();
             }
             byteArrayInputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -410,11 +399,7 @@ public class Client {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName));
             bufferedOutputStream.write(decryptedBytes);
             bufferedOutputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }

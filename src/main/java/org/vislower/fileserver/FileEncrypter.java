@@ -9,13 +9,13 @@ public class FileEncrypter {
 
     private final Key secretKey;
     private final Cipher cipher;
-    private final String algorithm = "AES/CBC/PKCS5PADDING";
     private final File fileToEncrypt;
     private final byte[] iv;
 
     public FileEncrypter(File file, Key secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         this.fileToEncrypt = file;
         this.secretKey = secretKey;
+        String algorithm = "AES/CBC/PKCS5PADDING";
         this.cipher = Cipher.getInstance(algorithm);
         this.iv = getIVSecureRandom();
     }
@@ -46,17 +46,8 @@ public class FileEncrypter {
 
             return encryptedByteFile;
 
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new RuntimeException(e);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalBlockSizeException e) {
-            throw new RuntimeException(e);
-        } catch (BadPaddingException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException |
+                 BadPaddingException e) {
             throw new RuntimeException(e);
         }
     }

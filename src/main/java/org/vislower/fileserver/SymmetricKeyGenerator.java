@@ -19,8 +19,6 @@ public class SymmetricKeyGenerator {
 
         keygenerator.init(256, securerandom);
 
-        SecretKey key = keygenerator.generateKey();
-
-        return key;
+        return keygenerator.generateKey();
     }
 }

@@ -18,7 +18,6 @@ class KeyStoreCreatorTest {
 
     private final String password = "1234";
     SecretKey symmetricKey = SymmetricKeyGenerator.createAESKey();
-    private KeyStore keyStoreTest = null;
 
     @BeforeAll
     void setup() throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {

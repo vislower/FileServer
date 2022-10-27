@@ -1,7 +1,5 @@
 package org.vislower.fileserver;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -10,8 +8,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClientTest {
@@ -31,12 +29,12 @@ class ClientTest {
     }
 
     @Test
-    void testIfClientSocketGetsCreated() throws IOException {
+    void testIfClientSocketGetsCreated() {
         assertNotNull(clientSocketTest);
     }
 
     @Test
-    void testIfClientSocketIsOnCorrectPort() throws IOException {
+    void testIfClientSocketIsOnCorrectPort() {
         assertEquals(clientSocketTest.getPort(), testPort);
     }
 

@@ -6,12 +6,9 @@ import java.net.Socket;
 
 public class Server {
 
-    private ServerSocket serverSocket;
-    private Socket socket;
-
     private int clientNumber = 0;
 
-    private int port;
+    private final int port;
 
     public Server(int serverPort) {
         port = serverPort;
@@ -19,6 +16,7 @@ public class Server {
 
     private void startServer() {
         System.out.println("Server started");
+        ServerSocket serverSocket;
         try {
             serverSocket = createServerSocket();
         } catch (IOException e) {
@@ -29,7 +27,7 @@ public class Server {
                 System.out.println("Waiting for client ...");
 
                 // server listening
-                socket = createClientSocket(serverSocket);
+                Socket socket = createClientSocket(serverSocket);
                 clientNumber ++;
                 System.out.println("Client " + clientNumber + " accepted");
 

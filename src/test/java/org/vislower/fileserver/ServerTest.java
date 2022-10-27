@@ -25,12 +25,12 @@ class ServerTest {
     }
 
     @Test
-    void testIfSocketServerGetsCreated() throws IOException {
+    void testIfSocketServerGetsCreated() {
         assertNotNull(serverSocketTest);
     }
 
     @Test
-    void testIfServerSocketListensOnCorrectPort() throws IOException {
+    void testIfServerSocketListensOnCorrectPort() {
         assertEquals(serverSocketTest.getLocalPort(), testPort);
     }
 

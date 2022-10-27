@@ -42,11 +42,7 @@ public class KeyStoreCreator {
         try {
             KeyStoreCreator keyStoreCreator = new KeyStoreCreator(password);
             keyStoreCreator.createKeyStoreWithSymmetricKey(secretKey, "ClientKeyStore.jks");
-        } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
-        } catch (CertificateException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }

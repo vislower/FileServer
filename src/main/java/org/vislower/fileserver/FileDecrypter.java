@@ -1,8 +1,10 @@
 package org.vislower.fileserver;
 
-import javax.crypto.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
-import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -12,7 +14,6 @@ public class FileDecrypter {
 
     private final Key secretKey;
     private final Cipher cipher;
-    private final String algorithm = "AES/CBC/PKCS5PADDING";
     private final byte[] encryptedBytesFile;
     private final byte[] iv = new byte[16];
 
@@ -20,6 +21,7 @@ public class FileDecrypter {
     public FileDecrypter(byte[] encryptedBytesFile, Key secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.encryptedBytesFile = encryptedBytesFile;
         this.secretKey = secretKey;
+        String algorithm = "AES/CBC/PKCS5PADDING";
         this.cipher = Cipher.getInstance(algorithm);
     }
 
@@ -29,15 +31,9 @@ public class FileDecrypter {
             System.arraycopy(encryptedBytesFile, 0, iv, 0, iv.length);
             System.arraycopy(encryptedBytesFile, iv.length, encryptedBytes, 0, encryptedBytes.length);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
-            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
-            return decryptedBytes;
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalBlockSizeException e) {
-            throw new RuntimeException(e);
-        } catch (BadPaddingException e) {
+            return cipher.doFinal(encryptedBytes);
+        } catch (InvalidAlgorithmParameterException | InvalidKeyException | IllegalBlockSizeException |
+                 BadPaddingException e) {
             throw new RuntimeException(e);
         }
     }
