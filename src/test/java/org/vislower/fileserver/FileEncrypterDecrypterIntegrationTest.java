@@ -38,7 +38,7 @@ class FileEncrypterDecrypterIntegrationTest {
     }
 
     @Test
-    void whenEncryptingFileAndThenDecryptingWithKeyInKeyStore_thenOriginalFileIsReturned() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, KeyStoreException, CertificateException, UnrecoverableKeyException {
+    void whenEncryptingFileAndThenDecryptingWithKeyFromKeyStore_thenOriginalFileIsReturned() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, KeyStoreException, CertificateException, UnrecoverableKeyException {
         File fileToEncrypt = new File("src/test/resources/java-developers-guide.pdf");
         KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(new FileInputStream("src/test/resources/KeyStoreTest.jks"), "1234".toCharArray());

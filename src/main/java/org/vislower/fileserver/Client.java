@@ -1,7 +1,10 @@
 package org.vislower.fileserver;
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.Socket;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -11,6 +14,7 @@ public class Client {
     private final DataOutputStream output;
     private final DataInputStream input;
     private final Socket socket;
+    private final Key symmetricKey;
 
     public Client(String address, int port){
         try {
@@ -18,8 +22,24 @@ public class Client {
             System.out.println("You are connected to the file server");
             output = SocketIO.createOutputStream(socket);
             input = SocketIO.createInputStream(socket);
+            InputStreamReader isr = new InputStreamReader(System.in);
+            BufferedReader br = new BufferedReader(isr);
 
+            System.out.print("Password to unlock the keystore : ");
+            String password = br.readLine();
+
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream("ClientKeyStore.jks"), password.toCharArray());
+            this.symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         }
     }
@@ -275,10 +295,12 @@ public class Client {
         return new Socket(address, port);
     }
 
-    private void sendFile(File file, String locationPath, String destinationPath) {// use ByteArrayInputStream to convert encrypted bytes to InputStream
+    private void sendFile(File file, String locationPath, String destinationPath) {
         try {
             int bytesCount;
-            FileInputStream fileInputStream = new FileInputStream(file);
+            FileEncrypter fileEncrypter = new FileEncrypter(file, symmetricKey);
+            byte[] encryptedBytes = fileEncrypter.getEncryptedBytesFromFile();
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encryptedBytes);
 
             // retrieve name of the file
             StringBuilder sb = new StringBuilder();
@@ -299,16 +321,20 @@ public class Client {
             output.writeUTF(fileName);
 
             // send file size
-            output.writeLong(file.length());
+            output.writeLong(encryptedBytes.length);
 
             // break file into chunks
             byte[] buffer = new byte[4096];
-            while ((bytesCount = fileInputStream.read(buffer)) != -1) {
+            while ((bytesCount = byteArrayInputStream.read(buffer)) != -1) {
                 output.write(buffer, 0, bytesCount);
                 output.flush();
             }
-            fileInputStream.close();
+            byteArrayInputStream.close();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -349,16 +375,25 @@ public class Client {
                 parentDirectory.mkdir();
             }
             String fileName = input.readUTF(); // retrieve name of the file
-            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             long size = input.readLong(); // read file size
             byte[] buffer = new byte[4096];
             while (size > 0 && (bytesCount = input.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1){ // write array to ByteArrayOutputStream and then convert to byte or read directly to array
-                fileOutputStream.write(buffer, 0, bytesCount);
+                byteArrayOutputStream.write(buffer, 0, bytesCount);
                 size -= bytesCount;
             }
-            fileOutputStream.close();
-
+            byte[] encryptedBytes = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
+            FileDecrypter fileDecrypter = new FileDecrypter(encryptedBytes, symmetricKey);
+            byte[] decryptedBytes = fileDecrypter.getDecryptedBytes();
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName));
+            bufferedOutputStream.write(decryptedBytes);
+            bufferedOutputStream.close();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
