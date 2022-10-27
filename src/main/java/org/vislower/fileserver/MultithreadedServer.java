@@ -136,13 +136,7 @@ public class MultithreadedServer implements Runnable{
         while (input.readBoolean()) {
             path = input.readUTF();
             File file = new File(path);
-            if (file.exists()){
-                file.delete();
-                output.writeBoolean(true);
-            }
-            else {
-                output.writeBoolean(false);
-            }
+            output.writeBoolean(file.delete());
         }
     }
 
