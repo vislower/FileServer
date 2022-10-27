@@ -16,7 +16,6 @@ public class MultithreadedServer implements Runnable{
         this.socket = socket;
     }
 
-    // TODO check if file or directory already exists
     @Override
     public void run() {
         // takes input from the client socket
@@ -28,104 +27,18 @@ public class MultithreadedServer implements Runnable{
             while (true){
                 request = input.readShort();
                 if (request == 0){
-                    int count = 0;
-                    while (input.readBoolean()){
-                        count++;
-                        receiveFile();
-                    }
-                    if (count == 1){
-                        System.out.println("File received from client " + clientNumber);
-                    }
-                    else if (count > 1){
-                        System.out.println("Files received from client " + clientNumber);
-                    }
+                    receiveFilesFromClient();
                 } else if (request == 1) {
-                    int count = 0;
-                    while (input.readBoolean()){
-                        count++;
-                        receiveDirectory();
-                    }
-                    if (count == 1){
-                        System.out.println("Directory received from client " + clientNumber);
-                    }
-                    else if (count > 1){
-                        System.out.println("Directories received from client " + clientNumber);
-                    }
+                    receiveDirectoriesFromClient();
                 } else if (request == 2) {
-                    // send file
-                    String locationPath;
-                    String destinationPath;
-                    ArrayList<File> files = new ArrayList<>();
-                    while (input.readBoolean()){
-                        locationPath = input.readUTF();
-                        File file = new File(locationPath);
-                        if (file.isFile()) {
-                            output.writeBoolean(true);
-                            files.add(file);
-                        }else {
-                            output.writeBoolean(false);
-                        }
-                    }
-                    if (!files.isEmpty()){
-                        destinationPath = input.readUTF();
-                        for (File f : files){
-                            output.writeBoolean(true);
-                            sendFile(f, f.getAbsolutePath(), destinationPath);
-                        }
-                        output.writeBoolean(false);
-                        System.out.println("File(s) sent to client " + clientNumber);
-                    }
+                    sendFilesToClient();
                 } else if (request == 3) {
-                    // send directory
-                    String locationPath;
-                    String destinationPath;
-                    ArrayList<File> directories = new ArrayList<>();
-                    while (input.readBoolean()){
-                        locationPath = input.readUTF();
-                        File directory = new File(locationPath);
-                        if (directory.isDirectory()) {
-                            output.writeBoolean(true);
-                            directories.add(directory);
-                        }else {
-                            output.writeBoolean(false);
-                        }
-                    }
-                    if (!directories.isEmpty()){
-                        destinationPath = input.readUTF();
-                        for (File d : directories){
-                            output.writeBoolean(true);
-                            sendDirectory(d, destinationPath);
-                        }
-                        output.writeBoolean(false);
-                        System.out.println("Directory(s) sent to client " + clientNumber);
-                    }
+                    sendDirectoriesToClient();
                 } else if (request == 4) {
-                    String path;
-                    while (input.readBoolean()) {
-                        path = input.readUTF();
-                        File file = new File(path);
-                        if (file.exists()){
-                            file.delete();
-                            output.writeBoolean(true);
-                        }
-                        else {
-                            output.writeBoolean(false);
-                        }
-                    }
+                    deleteFilesFromClientRequest();
                 } else if (request == 5) {
-                    String path;
-                    while (input.readBoolean()) {
-                        path = input.readUTF();
-                        File directory = new File(path);
-                        if (directory.isDirectory()){
-                            deleteDirectory(directory);
-                            output.writeBoolean(true);
-                        }else {
-                            output.writeBoolean(false);
-                        }
-                    }
+                    deleteDirectoriesFromClientRequest();
                 } else if (request == 6){
-                    // close session
                     System.out.println("Closing session for client " + clientNumber);
                     break;
                 }
@@ -138,6 +51,113 @@ public class MultithreadedServer implements Runnable{
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void receiveFilesFromClient() throws IOException {
+        int count = 0;
+        while (input.readBoolean()){
+            count++;
+            receiveFile();
+        }
+        if (count == 1){
+            System.out.println("File received from client " + clientNumber);
+        }
+        else if (count > 1){
+            System.out.println("Files received from client " + clientNumber);
+        }
+    }
+
+    private void receiveDirectoriesFromClient() throws IOException {
+        int count = 0;
+        while (input.readBoolean()){
+            count++;
+            receiveDirectory();
+        }
+        if (count == 1){
+            System.out.println("Directory received from client " + clientNumber);
+        }
+        else if (count > 1){
+            System.out.println("Directories received from client " + clientNumber);
+        }
+    }
+
+    private void sendFilesToClient() throws IOException {
+        String locationPath;
+        String destinationPath;
+        ArrayList<File> files = new ArrayList<>();
+        while (input.readBoolean()){
+            locationPath = input.readUTF();
+            File file = new File(locationPath);
+            if (file.isFile()) {
+                output.writeBoolean(true);
+                files.add(file);
+            }else {
+                output.writeBoolean(false);
+            }
+        }
+        if (!files.isEmpty()){
+            destinationPath = input.readUTF();
+            for (File f : files){
+                output.writeBoolean(true);
+                sendFile(f, f.getAbsolutePath(), destinationPath);
+            }
+            output.writeBoolean(false);
+            System.out.println("File(s) sent to client " + clientNumber);
+        }
+    }
+
+    private void sendDirectoriesToClient() throws IOException {
+        String locationPath;
+        String destinationPath;
+        ArrayList<File> directories = new ArrayList<>();
+        while (input.readBoolean()){
+            locationPath = input.readUTF();
+            File directory = new File(locationPath);
+            if (directory.isDirectory()) {
+                output.writeBoolean(true);
+                directories.add(directory);
+            }else {
+                output.writeBoolean(false);
+            }
+        }
+        if (!directories.isEmpty()){
+            destinationPath = input.readUTF();
+            for (File d : directories){
+                output.writeBoolean(true);
+                sendDirectory(d, destinationPath);
+            }
+            output.writeBoolean(false);
+            System.out.println("Directory(s) sent to client " + clientNumber);
+        }
+    }
+
+    private void deleteFilesFromClientRequest() throws IOException {
+        String path;
+        while (input.readBoolean()) {
+            path = input.readUTF();
+            File file = new File(path);
+            if (file.exists()){
+                file.delete();
+                output.writeBoolean(true);
+            }
+            else {
+                output.writeBoolean(false);
+            }
+        }
+    }
+
+    private void deleteDirectoriesFromClientRequest() throws IOException {
+        String path;
+        while (input.readBoolean()) {
+            path = input.readUTF();
+            File directory = new File(path);
+            if (directory.isDirectory()){
+                deleteDirectory(directory);
+                output.writeBoolean(true);
+            }else {
+                output.writeBoolean(false);
+            }
+        }
     }
 
     private void receiveFile() {
