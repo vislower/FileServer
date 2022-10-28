@@ -114,7 +114,7 @@ public class Client {
 
             for (File f : files){
                 output.writeBoolean(true);
-                sendFile(f, f.getAbsolutePath(), destinationPath);
+                sendFile(f, destinationPath);
             }
             output.writeBoolean(false);
             if (files.size() < 2){
@@ -313,13 +313,14 @@ public class Client {
         }
     }
 
-    private void sendFile(File file, String locationPath, String destinationPath) {
+    private void sendFile(File file, String destinationPath) {
         try {
             int bytesCount;
             FileEncrypter fileEncrypter = new FileEncrypter(file, symmetricKey);
             byte[] encryptedBytes = fileEncrypter.getEncryptedBytesFromFile();
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encryptedBytes);
 
+            String locationPath = file.getAbsolutePath();
             // retrieve name of the file
             StringBuilder sb = new StringBuilder();
             for (int i = locationPath.length() - 1; i >= 0; i--) {
@@ -366,7 +367,7 @@ public class Client {
                 for (File f : files) {
                     if (f.isFile()) {
                         output.writeShort(0);
-                        sendFile(f, f.getAbsolutePath(), newDestinationPath);
+                        sendFile(f, newDestinationPath);
                     } else if (f.isDirectory()) {
                         output.writeShort(1);
                         sendDirectory(f, newDestinationPath);

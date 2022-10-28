@@ -99,7 +99,7 @@ public class MultithreadedServer implements Runnable{
             destinationPath = input.readUTF();
             for (File f : files){
                 output.writeBoolean(true);
-                sendFile(f, f.getAbsolutePath(), destinationPath);
+                sendFile(f, destinationPath);
             }
             output.writeBoolean(false);
             System.out.println("File(s) sent to client " + clientNumber);
@@ -206,11 +206,12 @@ public class MultithreadedServer implements Runnable{
         }
     }
 
-    private void sendFile(File file, String locationPath, String destinationPath) {
+    private void sendFile(File file, String destinationPath) {
         try {
             int bytesCount;
             FileInputStream fileInputStream = new FileInputStream(file);
 
+            String locationPath = file.getAbsolutePath();
             // retrieve name of the file
             StringBuilder sb = new StringBuilder();
             for (int i = locationPath.length() - 1; i >= 0; i--) {
@@ -257,7 +258,7 @@ public class MultithreadedServer implements Runnable{
                 for (File f : files) {
                     if (f.isFile()) {
                         output.writeShort(0);
-                        sendFile(f, f.getAbsolutePath(), newDestinationPath);
+                        sendFile(f, newDestinationPath);
                     } else if (f.isDirectory()) {
                         output.writeShort(1);
                         sendDirectory(f, newDestinationPath);
