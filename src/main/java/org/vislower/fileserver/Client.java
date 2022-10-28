@@ -14,7 +14,7 @@ public class Client {
     private final DataOutputStream output;
     private final DataInputStream input;
     private final Socket socket;
-    private final Key symmetricKey;
+    private static Key symmetricKey;
 
     public Client(String address, int port){
         try {
@@ -22,23 +22,14 @@ public class Client {
             System.out.println("You are connected to the file server");
             output = SocketIO.createOutputStream(socket);
             input = SocketIO.createInputStream(socket);
-            InputStreamReader isr = new InputStreamReader(System.in);
-            BufferedReader br = new BufferedReader(isr);
-
-            System.out.print("Password to unlock the keystore : ");
-            String password = br.readLine();
-
-            KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(new FileInputStream("ClientKeyStore.jks"), password.toCharArray());
-            this.symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
-        } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException |
-                 CertificateException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void execute(){
         try {
+            unlockKeyStore();
             while (true){
                 Scanner sc = new Scanner(System.in);
                 System.out.println("\nWelcome to the file transfer server enter :\n[0] to send files\n[1] to send directories\n[2] to request files\n[3] to request directories\n[4] to delete a file on the server\n[5] to delete a directory from the server\n[6] to quit");
@@ -66,13 +57,26 @@ public class Client {
             input.close();
             output.close();
             socket.close();
-        } catch (IOException e) {
+        } catch (IOException | UnrecoverableKeyException | CertificateException | KeyStoreException |
+                 NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Socket createClientSocket(String address, int port) throws IOException {
         return new Socket(address, port);
+    }
+
+    public static void unlockKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+
+        System.out.print("Password to unlock the keystore : ");
+        String password = br.readLine();
+
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(new FileInputStream("ClientKeyStore.jks"), password.toCharArray());
+        symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
     }
 
     private void sendFilesToServer() throws IOException {
