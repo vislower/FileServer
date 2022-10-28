@@ -67,7 +67,7 @@ public class Client {
         return new Socket(address, port);
     }
 
-    public static void unlockKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    private static void unlockKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
 
