@@ -14,7 +14,7 @@ public class Server {
         port = serverPort;
     }
 
-    private void startServer() {
+    public void startServer() {
         System.out.println("Server started");
         ServerSocket serverSocket;
         try {

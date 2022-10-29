@@ -27,7 +27,7 @@ public class Client {
         }
     }
 
-    private void execute(){
+    public void execute(){
         try {
             unlockKeyStore();
             while (true){
