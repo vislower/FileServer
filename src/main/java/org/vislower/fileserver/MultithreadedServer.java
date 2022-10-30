@@ -56,7 +56,7 @@ public class MultithreadedServer implements Runnable{
     private void receiveFilesFromClient() throws IOException {
         int count = 0;
         while (input.readBoolean()){
-            count++;
+            count++; // count number of files received
             receiveFile();
         }
         if (count == 1){
@@ -70,7 +70,7 @@ public class MultithreadedServer implements Runnable{
     private void receiveDirectoriesFromClient() throws IOException {
         int count = 0;
         while (input.readBoolean()){
-            count++;
+            count++; // count number of directories received
             receiveDirectory();
         }
         if (count == 1){
@@ -85,7 +85,7 @@ public class MultithreadedServer implements Runnable{
         String locationPath;
         String destinationPath;
         ArrayList<File> files = new ArrayList<>();
-        while (input.readBoolean()){
+        while (input.readBoolean()){ // receive files as long as client sends them
             locationPath = input.readUTF();
             File file = new File(locationPath);
             if (file.isFile()) {
@@ -95,7 +95,7 @@ public class MultithreadedServer implements Runnable{
                 output.writeBoolean(false);
             }
         }
-        if (!files.isEmpty()){
+        if (!files.isEmpty()){ // check if server has to send files
             destinationPath = input.readUTF();
             for (File f : files){
                 output.writeBoolean(true);
@@ -249,10 +249,10 @@ public class MultithreadedServer implements Runnable{
         File[] files;
         String newDestinationPath = destinationPath + directory.getName() + "/";
         try {
-            // send parent directory name
+            // send parent directory name, so it can be created if it already doesn't exist on the client
             output.writeUTF(destinationPath);
 
-            output.writeUTF(newDestinationPath);
+            output.writeUTF(newDestinationPath); // new path with the directory that will be sent
             files = directory.listFiles();
             if (files != null) {
                 for (File f : files) {

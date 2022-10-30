@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 public class SymmetricKeyGenerator {
-
+    // create symmetric AES 256 bits key from a SecureRandom number
     public static SecretKey createAESKey() {
         SecureRandom securerandom = new SecureRandom();
 

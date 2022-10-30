@@ -6,7 +6,6 @@ import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Scanner;
 
 
@@ -317,6 +316,7 @@ public class Client {
     private void sendFile(File file, String destinationPath) {
         try {
             int bytesCount;
+            // get encrypted bytes from file to be sent
             FileEncrypter fileEncrypter = new FileEncrypter(file, symmetricKey);
             byte[] encryptedBytes = fileEncrypter.getEncryptedBytesFromFile();
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encryptedBytes);
@@ -394,7 +394,7 @@ public class Client {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             long size = input.readLong(); // read file size
             byte[] buffer = new byte[4096];
-            while (size > 0 && (bytesCount = input.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1){ // write array to ByteArrayOutputStream and then convert to byte or read directly to array
+            while (size > 0 && (bytesCount = input.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1){ // read file by chunks
                 byteArrayOutputStream.write(buffer, 0, bytesCount);
                 size -= bytesCount;
             }
@@ -402,7 +402,7 @@ public class Client {
             byteArrayOutputStream.close();
             FileDecrypter fileDecrypter = new FileDecrypter(encryptedBytes, symmetricKey);
             byte[] decryptedBytes = fileDecrypter.getDecryptedBytes();
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName));
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName)); // create file
             bufferedOutputStream.write(decryptedBytes);
             bufferedOutputStream.close();
         } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
@@ -412,6 +412,7 @@ public class Client {
 
     private void receiveDirectory() {
         try {
+            // makes sure parent directory exist
             String parentDirectoryName = input.readUTF();
             File parentDirectory = new File(parentDirectoryName);
             if (!parentDirectory.exists()){

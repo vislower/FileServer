@@ -28,9 +28,9 @@ public class FileDecrypter {
     public byte[] getDecryptedBytes() {
         try {
             byte[] encryptedBytes = new byte[(encryptedBytesFile.length - iv.length)];
-            System.arraycopy(encryptedBytesFile, 0, iv, 0, iv.length);
-            System.arraycopy(encryptedBytesFile, iv.length, encryptedBytes, 0, encryptedBytes.length);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+            System.arraycopy(encryptedBytesFile, 0, iv, 0, iv.length); // get iv from file
+            System.arraycopy(encryptedBytesFile, iv.length, encryptedBytes, 0, encryptedBytes.length); // get actual encrypted bytes
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv)); // decrypt
             return cipher.doFinal(encryptedBytes);
         } catch (InvalidAlgorithmParameterException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {

@@ -20,7 +20,7 @@ public class FileEncrypter {
         this.iv = getIVSecureRandom();
     }
 
-    private byte[] getIVSecureRandom() {
+    private byte[] getIVSecureRandom() { // generate iv with SecureRandom number
         try {
             SecureRandom secureRandom = SecureRandom.getInstanceStrong();
             byte[] iv = new byte[cipher.getBlockSize()];
@@ -38,14 +38,12 @@ public class FileEncrypter {
             bufferedInputStream.read(byteFile);
 
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
-            byte[] encryptedBytes = cipher.doFinal(byteFile);
+            byte[] encryptedBytes = cipher.doFinal(byteFile); // encrypt bytes from file
 
             byte[] encryptedByteFile = new byte[(int) (encryptedBytes.length + iv.length)];
-            System.arraycopy(iv, 0, encryptedByteFile, 0, iv.length);
-            System.arraycopy(encryptedBytes,0 ,encryptedByteFile ,iv.length ,encryptedBytes.length);
-
+            System.arraycopy(iv, 0, encryptedByteFile, 0, iv.length);// put iv at the beginning of the array
+            System.arraycopy(encryptedBytes,0 ,encryptedByteFile ,iv.length ,encryptedBytes.length);// then put encrypted bytes
             return encryptedByteFile;
-
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException |
                  BadPaddingException e) {
             throw new RuntimeException(e);

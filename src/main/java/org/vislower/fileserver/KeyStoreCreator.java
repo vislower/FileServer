@@ -20,11 +20,12 @@ public class KeyStoreCreator {
 
     public void createKeyStoreWithSymmetricKey(SecretKey symmetricKey, String path) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         keyStore.load(null, keyStorePassword);
+        // create new entry for symmetric key
         KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(symmetricKey);
         KeyStore.ProtectionParameter entryPassword = new KeyStore.PasswordProtection(keyStorePassword);
         keyStore.setEntry("FileEncryptionAESKey", secretKeyEntry, entryPassword);
         FileOutputStream fileOutputStream = new FileOutputStream(path);
-        keyStore.store(fileOutputStream, keyStorePassword);
+        keyStore.store(fileOutputStream, keyStorePassword); // save keystore
         fileOutputStream.close();
     }
 }
