@@ -30,7 +30,16 @@ If you don't want to build the project yourself, you can go to the release secti
     ```
     git clone https://github.com/vislower/FileServer.git
     ```
-2. Go inside the project folder and run:
+2. To compile, run the tests and package the project in a `.jar` file, go inside the project folder and run :
+    * For UNIX systems:
+      ```
+       ./mvnw package
+      ```
+    * For Windows:
+      ```
+       mvnw.cmd package
+      ```
+3. Optionally you can install the packaged `.jar` file into your local maven repository by running:
    * For UNIX systems:
      ```
       ./mvnw clean install
@@ -39,7 +48,6 @@ If you don't want to build the project yourself, you can go to the release secti
      ```
       mvnw.cmd clean install
      ```
-3. Find the FileServer-1.0-SNAPSHOT.jar in your local maven repository.
 
 ## Run the application :heavy_check_mark:
 1. Simply run the application with:
