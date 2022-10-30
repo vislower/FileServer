@@ -24,7 +24,7 @@ Actions supported:
 * You need to know the local IP address of the machine that will act as the server and choose a port on which the server will listen (you will need these information to connect clients to the server).
 
 ## Installation  🔌
-If you don't want to build the project yourself, you can go to the release section and download the .jar file.
+If you don't want to build the project yourself, you can go to the release section and download the `FileServer-1.0-SNAPSHOT.jar` file.
 ## Build the project 🔧
 1. Download the repository files (project) from the green `code` button or clone the project with the following command:
     ```
