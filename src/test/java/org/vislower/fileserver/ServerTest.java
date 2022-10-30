@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ServerTest {
-    int testPort = 9001;
+    int testPort = 5000;
     public Server serverTest;
     public ServerSocket serverSocketTest;
 
