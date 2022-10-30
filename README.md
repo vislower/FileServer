@@ -4,7 +4,7 @@ A very simple File Server application written in Java.
 
 <a href="https://www.gnu.org/licenses/gpl-3.0" alt="License: GPLv3"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg"></a>
 
-## Overview
+## Overview :page_with_curl:
 Actions supported:
 * send multiple files and folders to server
 * retrieve multiple files and folders from server
