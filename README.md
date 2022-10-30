@@ -41,7 +41,7 @@ If you don't want to build the project yourself, you can go to the release secti
      ```
 3. Find the FileServer-1.0-SNAPSHOT.jar in your local maven repository.
 
-## Run the application :arrow_forward:
+## Run the application :heavy_check_mark:
 1. Simply run the application with:
     ```
     java -jar FileServer-1.0-SNAPSHOT.jar
@@ -49,7 +49,7 @@ If you don't want to build the project yourself, you can go to the release secti
 2. First run the serverside of the application on one machine. Then run the clientside of the application on another machine.
 3. Follow the prompt.
 
-### Contributing 💡
+## Contributing 💡
 If you want to contribute to this project and make it better with new ideas, your pull request is very welcomed.
 If you find any issue just put it in the repository issue section, thank you.
 
