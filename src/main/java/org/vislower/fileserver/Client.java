@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Scanner;
 
 
@@ -27,9 +28,9 @@ public class Client {
         }
     }
 
-    public void execute(){
+    public void execute(String keyStoreName){
         try {
-            unlockKeyStore();
+            unlockKeyStore(keyStoreName);
             while (true){
                 Scanner sc = new Scanner(System.in);
                 System.out.println("\nWelcome to the file transfer server enter :\n[0] to send files\n[1] to send directories\n[2] to request files\n[3] to request directories\n[4] to delete a file on the server\n[5] to delete a directory from the server\n[6] to quit");
@@ -67,7 +68,7 @@ public class Client {
         return new Socket(address, port);
     }
 
-    private static void unlockKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    private static void unlockKeyStore(String keyStoreName) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
 
@@ -75,7 +76,7 @@ public class Client {
         String password = br.readLine();
 
         KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream("ClientKeyStore.jks"), password.toCharArray());
+        ks.load(new FileInputStream(keyStoreName), password.toCharArray());
         symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
     }
 
@@ -441,7 +442,7 @@ public class Client {
 
     public static void main(String[] args) {
         Client client = new Client("127.0.0.1", 5000);
-        client.execute();
+        client.execute("ClientKeyStore.jks");
 
     }
 }

@@ -1,10 +1,8 @@
 package org.vislower.fileserver;
 
 import javax.crypto.SecretKey;
-import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -28,22 +26,5 @@ public class KeyStoreCreator {
         FileOutputStream fileOutputStream = new FileOutputStream(path);
         keyStore.store(fileOutputStream, keyStorePassword);
         fileOutputStream.close();
-    }
-
-    public static void main(String[] args) throws IOException {
-        SecretKey secretKey = SymmetricKeyGenerator.createAESKey();
-
-        InputStreamReader isr = new InputStreamReader(System.in);
-        BufferedReader br = new BufferedReader(isr);
-
-        System.out.print("Password for the new KeyStore : ");
-        String password = br.readLine();
-
-        try {
-            KeyStoreCreator keyStoreCreator = new KeyStoreCreator(password);
-            keyStoreCreator.createKeyStoreWithSymmetricKey(secretKey, "ClientKeyStore.jks");
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
