@@ -1,6 +1,5 @@
 package org.vislower.fileserver;
 
-import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.Socket;
 import java.security.*;
@@ -350,7 +349,7 @@ public class Client {
                 output.flush();
             }
             byteArrayInputStream.close();
-        } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -405,7 +404,7 @@ public class Client {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName)); // create file
             bufferedOutputStream.write(decryptedBytes);
             bufferedOutputStream.close();
-        } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
