@@ -4,6 +4,8 @@ import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 // driver class
@@ -55,7 +57,13 @@ public class Main {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
+        } catch (InputMismatchException e) {
+            System.out.println("ERROR : input is not of type int");
+        } catch (NoSuchElementException e){
+            System.out.println("ERROR : input is exhausted");
+        } catch (IllegalStateException e) {
+            System.out.println("ERROR : the scanner is closed");
         }
 
     }
