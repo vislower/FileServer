@@ -2,6 +2,7 @@ package org.vislower.fileserver;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -10,15 +11,26 @@ public class SymmetricKeyGenerator {
     public static SecretKey createAESKey() {
         SecureRandom securerandom = new SecureRandom();
 
-        KeyGenerator keygenerator;
+        KeyGenerator keygenerator = null;
         try {
             keygenerator = KeyGenerator.getInstance("AES");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : Provider does not support a KeyGeneratorSpi implementation for the specified algorithm");
+        } catch (NullPointerException e){
+            System.out.println("ERROR : algorithm is null");
         }
 
-        keygenerator.init(256, securerandom);
+        if (keygenerator != null) {
+            try {
+                keygenerator.init(256, securerandom);
+            } catch (InvalidParameterException e){
+                System.out.println("ERROR : keysize is wrong or not supported");
+            }
+        }
 
-        return keygenerator.generateKey();
+        if (keygenerator != null) {
+            return keygenerator.generateKey();
+        }
+        return null;
     }
 }
