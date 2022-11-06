@@ -4,9 +4,6 @@ import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.Scanner;
 
 // driver class
@@ -57,7 +54,7 @@ public class Main {
                     break;
                 }
             }
-        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
