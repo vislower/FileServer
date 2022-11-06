@@ -17,37 +17,44 @@ public class Server {
     public void startServer() {
         System.out.println("Server started");
         ServerSocket serverSocket;
-        try {
-            serverSocket = createServerSocket();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        while(true) {
-            try {
+        serverSocket = createServerSocket();
+        if (serverSocket != null){
+            while(true) {
                 System.out.println("Waiting for client ...");
 
                 // server listening
                 Socket socket = createClientSocket(serverSocket);
-                clientNumber ++;
-                System.out.println("Client " + clientNumber + " accepted");
+                if (socket != null){
+                    clientNumber ++;
+                    System.out.println("Client " + clientNumber + " accepted");
 
-                // MULTITHREADING
-                MultithreadedServer ms = new MultithreadedServer(clientNumber, socket);
-                Thread thread = new Thread(ms);
-                thread.start();
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                    // MULTITHREADING
+                    MultithreadedServer ms = new MultithreadedServer(clientNumber, socket);
+                    Thread thread = new Thread(ms);
+                    thread.start();
+                }
             }
         }
     }
 
-    public ServerSocket createServerSocket() throws IOException {
-        return new ServerSocket(port);
+    public ServerSocket createServerSocket() {
+        try {
+            return new ServerSocket(port);
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occurred when opening the socket");
+        } catch (IllegalArgumentException e){
+            System.out.println("ERROR : illegal port number");
+        }
+        return null;
     }
 
-    public Socket createClientSocket(ServerSocket serverSocket) throws IOException {
-        return serverSocket.accept();
+    public Socket createClientSocket(ServerSocket serverSocket){
+        try {
+            return serverSocket.accept();
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occurred when waiting for a connection");
+        }
+        return null;
     }
 
     public static void main(String[] args) {
