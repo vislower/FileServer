@@ -14,7 +14,7 @@ Actions supported:
 * automatic decryption of each file retrieved from server
 * encryption is done with AES 256-bit key stored in a KeyStore (the KeyStore is locked with user password)
 
-**The application is for the moment only available in CLI, a GUI version is planned.**
+**The application is only available in CLI.**
 
 ## Requirements :page_facing_up:
 * Java version 18 or higher installed on two machines (one will be the client and the other the server), you can check your java version with:
