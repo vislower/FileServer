@@ -27,34 +27,38 @@ public class Client {
 
     public void execute(String keyStoreName){
         try {
-            unlockKeyStore(keyStoreName);
-            while (true){
-                Scanner sc = new Scanner(System.in);
-                System.out.println("\nWelcome to the file transfer server enter :\n[0] to send files\n[1] to send directories\n[2] to request files\n[3] to request directories\n[4] to delete a file on the server\n[5] to delete a directory from the server\n[6] to quit");
-                int answer = sc.nextInt();
-                if (answer == 0){
-                    sendFilesToServer();
-                } else if (answer == 1) {
-                    sendDirectoriesToServer();
-                } else if (answer == 2) {
-                    requestFilesFromServer();
-                } else if (answer == 3) {
-                    requestDirectoriesFromServer();
-                } else if (answer == 4) {
-                    requestFilesDeletionFromServer();
-                } else if (answer == 5) {
-                    requestDirectoriesDeletionFromServer();
-                } else if (answer == 6) {
-                    System.out.println("Quitting the program");
-                    output.writeShort(6);
-                    break;
-                }else {
-                    System.out.println("You must choose between the choices");
+            if (socket != null){
+                if (unlockKeyStore(keyStoreName)){
+                    while (true){
+                        Scanner sc = new Scanner(System.in);
+                        System.out.println("\nWelcome to the file transfer server enter :\n[0] to send files\n[1] to send directories\n[2] to request files\n[3] to request directories\n[4] to delete a file on the server\n[5] to delete a directory from the server\n[6] to quit");
+                        int answer = sc.nextInt();
+                        if (answer == 0){
+                            sendFilesToServer();
+                        } else if (answer == 1) {
+                            sendDirectoriesToServer();
+                        } else if (answer == 2) {
+                            requestFilesFromServer();
+                        } else if (answer == 3) {
+                            requestDirectoriesFromServer();
+                        } else if (answer == 4) {
+                            requestFilesDeletionFromServer();
+                        } else if (answer == 5) {
+                            requestDirectoriesDeletionFromServer();
+                        } else if (answer == 6) {
+                            System.out.println("Quitting the program");
+                            output.writeShort(6);
+                            break;
+                        }else {
+                            System.out.println("You must choose between the choices");
+                        }
+                    }
+                    input.close();
+                    output.close();
+                    socket.close();
                 }
             }
-            input.close();
-            output.close();
-            socket.close();
+
         } catch (IOException e) {
             System.out.println("ERROR : an I/O error occured");
         }
@@ -65,15 +69,15 @@ public class Client {
             return new Socket(address, port);
         } catch (UnknownHostException e){
             System.out.println("ERROR : the IP address of the host could not be determined");
-        } catch (IOException e) {
-            System.out.println("ERROR : an I/O error occured when creating the socket");
         }catch (IllegalArgumentException e) {
             System.out.println("ERROR : port is out of range");
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured when creating the socket");
         }
         return null;
     }
 
-    private static void unlockKeyStore(String keyStoreName) {
+    private static boolean unlockKeyStore(String keyStoreName) {
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
 
@@ -109,15 +113,17 @@ public class Client {
             if (ks != null) {
                 if (password != null) {
                     symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
+                    return true;
                 }
             }
         } catch (KeyStoreException e) {
-            System.out.println("ERROR : the keystore has not been initialized (loaded)");
+            System.out.println("ERROR : the keystore has not been initialized (loaded), keystore may not exist");
         } catch (NoSuchAlgorithmException e) {
             System.out.println("ERROR : the algorithm for recovering the key cannot be found");
         } catch (UnrecoverableKeyException e) {
             System.out.println("ERROR : the key cannot be recovered, it may be due to a wrong password input");
         }
+        return false;
     }
 
     private void sendFilesToServer() throws IOException {

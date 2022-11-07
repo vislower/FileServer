@@ -20,7 +20,7 @@ class KeyStoreCreatorTest {
     SecretKey symmetricKey = SymmetricKeyGenerator.createAESKey();
 
     @BeforeAll
-    void setup() throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    void setup() {
         KeyStoreCreator keyStoreCreator = new KeyStoreCreator(password);
         keyStoreCreator.createKeyStoreWithSymmetricKey(symmetricKey, "src/test/resources/KeyStoreTest.jks");
     }

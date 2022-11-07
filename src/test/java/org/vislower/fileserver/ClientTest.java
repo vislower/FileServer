@@ -21,7 +21,7 @@ class ClientTest {
     public Socket clientSocketTest;
 
     @BeforeAll
-    void setup() throws IOException {
+    void setup() {
         serverTest = new Server(testPort);
         serverSocketTest = serverTest.createServerSocket();
         clientTest = new Client(testAddress, testPort);

@@ -19,7 +19,7 @@ class ServerTest {
     public ServerSocket serverSocketTest;
 
     @BeforeAll
-    void setup() throws IOException {
+    void setup() {
         serverTest = new Server(testPort);
         serverSocketTest = serverTest.createServerSocket();
     }
