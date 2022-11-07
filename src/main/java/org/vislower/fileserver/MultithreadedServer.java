@@ -48,7 +48,7 @@ public class MultithreadedServer implements Runnable{
             output.close();
             socket.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
 
     }
@@ -59,11 +59,8 @@ public class MultithreadedServer implements Runnable{
             count++; // count number of files received
             receiveFile();
         }
-        if (count == 1){
-            System.out.println("File received from client " + clientNumber);
-        }
-        else if (count > 1){
-            System.out.println("Files received from client " + clientNumber);
+        if (count > 0){
+            System.out.println("File(s) received from client " + clientNumber);
         }
     }
 
@@ -73,11 +70,8 @@ public class MultithreadedServer implements Runnable{
             count++; // count number of directories received
             receiveDirectory();
         }
-        if (count == 1){
-            System.out.println("Directory received from client " + clientNumber);
-        }
-        else if (count > 1){
-            System.out.println("Directories received from client " + clientNumber);
+        if (count > 0){
+            System.out.println("Directory(s) received from client " + clientNumber);
         }
     }
 
@@ -155,7 +149,6 @@ public class MultithreadedServer implements Runnable{
     }
 
     private void receiveFile() {
-
         try {
             int bytesCount;
             String parentDirectoryName = input.readUTF();
@@ -172,8 +165,10 @@ public class MultithreadedServer implements Runnable{
                 size -= bytesCount;
             }
             fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR : file not found");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -202,7 +197,7 @@ public class MultithreadedServer implements Runnable{
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -240,8 +235,10 @@ public class MultithreadedServer implements Runnable{
                 output.flush();
             }
             fileInputStream.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR : file not found");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -266,8 +263,8 @@ public class MultithreadedServer implements Runnable{
                 }
             }
             output.writeShort(2);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
