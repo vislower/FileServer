@@ -2,6 +2,7 @@ package org.vislower.fileserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -10,19 +11,17 @@ import java.util.Scanner;
 
 public class Client {
 
-    private final DataOutputStream output;
-    private final DataInputStream input;
+    private DataOutputStream output;
+    private DataInputStream input;
     private final Socket socket;
     private static Key symmetricKey;
 
     public Client(String address, int port){
-        try {
-            socket = createClientSocket(address, port);
+        socket = createClientSocket(address, port);
+        if (socket != null) {
             System.out.println("You are connected to the file server");
             output = SocketIO.createOutputStream(socket);
             input = SocketIO.createInputStream(socket);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -56,26 +55,69 @@ public class Client {
             input.close();
             output.close();
             socket.close();
-        } catch (IOException | UnrecoverableKeyException | CertificateException | KeyStoreException |
-                 NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
-    public Socket createClientSocket(String address, int port) throws IOException {
-        return new Socket(address, port);
+    public Socket createClientSocket(String address, int port){
+        try {
+            return new Socket(address, port);
+        } catch (UnknownHostException e){
+            System.out.println("ERROR : the IP address of the host could not be determined");
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured when creating the socket");
+        }catch (IllegalArgumentException e) {
+            System.out.println("ERROR : port is out of range");
+        }
+        return null;
     }
 
-    private static void unlockKeyStore(String keyStoreName) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    private static void unlockKeyStore(String keyStoreName) {
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
 
         System.out.print("Password to unlock the keystore : ");
-        String password = br.readLine();
-
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream(keyStoreName), password.toCharArray());
-        symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
+        String password = null;
+        try {
+            password = br.readLine();
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured");
+        }
+        KeyStore ks = null;
+        try {
+            ks = KeyStore.getInstance("JKS");
+        } catch (KeyStoreException e) {
+            System.out.println("ERROR : no Provider supports a KeyStoreSpi implementation for the specified type");
+        } catch (NullPointerException e) {
+            System.out.println("ERROR : KeyStore type is null");
+        }
+        try {
+            if (ks != null) {
+                if (password != null) {
+                    ks.load(new FileInputStream(keyStoreName), password.toCharArray());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR : incorrect password or an I/O or format problem with the keystore data occured");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("ERROR : the algorithm used to check the integrity of the keystore cannot be found");
+        } catch (CertificateException e) {
+            System.out.println("ERROR : one or more certificates in the keystore could not be loaded");
+        }
+        try {
+            if (ks != null) {
+                if (password != null) {
+                    symmetricKey = ks.getKey("FileEncryptionAESKey", password.toCharArray());
+                }
+            }
+        } catch (KeyStoreException e) {
+            System.out.println("ERROR : the keystore has not been initialized (loaded)");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("ERROR : the algorithm for recovering the key cannot be found");
+        } catch (UnrecoverableKeyException e) {
+            System.out.println("ERROR : the key cannot be recovered, it may be due to a wrong password input");
+        }
     }
 
     private void sendFilesToServer() throws IOException {
@@ -116,12 +158,7 @@ public class Client {
                 sendFile(f, destinationPath);
             }
             output.writeBoolean(false);
-            if (files.size() < 2){
-                System.out.println("File sent");
-            }
-            else {
-                System.out.println("Files sent");
-            }
+            System.out.println("File(s) sent");
         }
     }
 
@@ -163,12 +200,7 @@ public class Client {
                 sendDirectory(d, destinationPath);
             }
             output.writeBoolean(false);
-            if (files.size() < 2){
-                System.out.println("Directory sent");
-            }
-            else {
-                System.out.println("Directories sent");
-            }
+            System.out.println("Directory(s) sent");
         }
     }
 
@@ -350,7 +382,7 @@ public class Client {
             }
             byteArrayInputStream.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -375,8 +407,8 @@ public class Client {
                 }
             }
             output.writeShort(2);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -404,8 +436,10 @@ public class Client {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName)); // create file
             bufferedOutputStream.write(decryptedBytes);
             bufferedOutputStream.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR : file not found");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
@@ -436,7 +470,7 @@ public class Client {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("ERROR : an I/O error occured");
         }
     }
 
